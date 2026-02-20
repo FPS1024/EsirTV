@@ -1,0 +1,20 @@
+services:
+  esirtv:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: esirtv
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      SETTINGS_FILE: /data/settings.json
+      DB_FILE: /data/esirtv.db
+      # 可选：直接注入 TVBox 配置链接，优先级高于 settings.json
+      # TVBOX_CONFIG_URL: https://example.com/tvbox.json
+    volumes:
+      - esirtv-data:/data
+    restart: unless-stopped
+
+volumes:
+  esirtv-data:

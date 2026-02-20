@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EsirTV </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div id="app" v-cloak>
+    <nav class="sticky top-0 z-50 bg-slate-900/85 backdrop-blur border-b border-slate-800 px-4 md:px-6 py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4 md:gap-8 min-w-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent cursor-pointer" @click="resetHome">EsirTV</h1>
+        <div class="hidden md:flex gap-4 text-slate-300 overflow-x-auto whitespace-nowrap">
+          <button class="hover:text-white" @click="filterType(HISTORY_TYPE_ID)" :class="{'text-blue-400': currentType===HISTORY_TYPE_ID}">历史记录</button>
+          <button class="hover:text-white" @click="filterType(FAVORITES_TYPE_ID)" :class="{'text-blue-400': currentType===FAVORITES_TYPE_ID}">收藏</button>
+          <button class="hover:text-white" v-for="type in types" :key="type.type_id" @click="filterType(type.type_id)" :class="{'text-blue-400': currentType===type.type_id}">
+            {{ type.type_name }}
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 md:gap-3">
+        <select v-if="sites.length" v-model="site" @change="switchSite(site)" class="bg-slate-800 border border-slate-700 rounded-lg py-2 px-3 text-sm text-slate-200">
+          <option v-for="s in sites" :key="s.key || s.name" :value="s.key || s.name">{{ s.name }}</option>
+        </select>
+        <input v-model.trim="keyword" @keyup.enter="searchMovies" type="text" placeholder="搜索影片..." class="bg-slate-800 rounded-lg py-2 px-3 text-sm w-40 md:w-56">
+        <button @click="searchMovies" class="bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded-lg text-sm">搜索</button>
+        <a href="./settings.html" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg text-sm">
+          <i class="fa-solid fa-gear"></i>
+          设置
+        </a>
+      </div>
+    </nav>
+
+    <main class="p-4 md:p-6">
+      <div v-if="errorMsg" class="mb-4 rounded-lg border border-amber-600/40 bg-amber-950/30 px-4 py-3 text-amber-200">
+        {{ errorMsg }}
+        <a href="./settings.html" class="underline ml-2">去设置</a>
+      </div>
+
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl md:text-2xl font-semibold">{{ currentTypeName }}</h2>
+        <div class="flex items-center gap-2">
+          <span v-if="searchMode" class="text-xs md:text-sm px-2 py-1 rounded bg-blue-500/20 border border-blue-500/30 text-blue-200">
+            搜索中：{{ activeKeyword }}
+          </span>
+          <button v-if="searchMode" @click="clearSearch" class="text-xs md:text-sm px-2 py-1 rounded bg-slate-800 hover:bg-slate-700">
+            清空搜索
+          </button>
+          <div class="text-slate-400 text-sm">第 {{ currentPage }} / {{ pagecount }} 页</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+        <article v-for="item in movies" :key="item.id" class="poster-card bg-slate-900 rounded-lg overflow-hidden shadow hover:shadow-xl transition" @click="goDetail(item)">
+          <img :src="item.poster" :alt="item.title" class="w-full h-64 object-cover">
+          <div class="px-2 py-2">
+            <h3 class="text-sm truncate">{{ item.title }}</h3>
+          </div>
+        </article>
+      </div>
+
+      <div v-if="isLoading" class="text-center text-slate-400 py-8">
+        <i class="fa-solid fa-spinner fa-spin mr-2"></i>加载中...
+      </div>
+
+      <div v-if="!isLoading && hasMore" class="text-center py-8">
+        <button v-if="!autoLoadSupported" @click="loadMore" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg">加载更多</button>
+        <p v-else class="text-slate-400 text-sm">正在自动加载更多...</p>
+      </div>
+      <div ref="loadMoreSentinel" class="h-2"></div>
+    </main>
+  </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/index.js"></script>
+</body>
+</html>
