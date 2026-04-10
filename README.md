@@ -1,68 +1,94 @@
+<p align="center">
+  <a href="./README.md"><strong>English</strong></a> ·
+  <a href="./README.zh-CN.md"><strong>简体中文</strong></a>
+</p>
+
 # EsirTV
 
-一个基于 **TVBox 配置** 的 Web 影视海报墙 + 播放器。
+A Web poster-wall + player built on **TVBox config**, with one-command Docker deployment.
 
-- 前端：Vue 3 + Vite（海报墙 / 详情播放 / 设置）
-- 播放器：ArtPlayer + hls.js（支持 `.m3u8`，倍速/快捷键等）
-- 后端：Node.js + Express（聚合站点、代理图片、历史记录/收藏 SQLite 持久化）
-- 部署：Docker Compose 一键启动
+## Features
 
-## 快速开始（Docker）
+- Poster wall: categories/search, history, favorites
+- Playback: ArtPlayer + hls.js (HLS `.m3u8` / common MP4), speed control/hotkeys/PiP
+- Settings: TVBox source, font upload & selection, language switch (`zh-CN` / `en-US` / `ug-CN`)
+- Persistence: SQLite (history/favorites) + settings.json (config/font/lang)
+
+## Tech Stack
+
+- Frontend: Vue 3 + Vite + vue-router + vue-i18n
+- Player: ArtPlayer + hls.js
+- Backend: Node.js + Express + better-sqlite3
+- Deploy: Docker / Docker Compose
+
+## Quick Start (Docker)
 
 ```bash
 docker compose up -d --build
 ```
 
-访问：
+Open:
 
-- 首页：`http://localhost:8080/`
-- 设置：`http://localhost:8080/settings`
+- Home: `http://localhost:8080/`
+- Settings: `http://localhost:8080/settings`
 
-首次使用请先到设置页填写 `TVBox` 配置链接（能解析出 `sites` 列表的 JSON）。
+First run: open Settings and fill in a **TVBox config URL** (a JSON that contains a `sites` list).
 
-停止：
+Stop:
 
 ```bash
 docker compose down
 ```
 
-## 配置与持久化
+## Configuration & Persistence
 
-默认使用命名卷 `esirtv-data` 持久化：
+By default, Compose uses a named volume `esirtv-data`:
 
-- `/data/settings.json`：配置（主要是 `configUrl`）
-- `/data/esirtv.db`：历史记录、收藏（SQLite）
+- `/data/settings.json`: app settings (`configUrl`, `uiFont`, `uiLang`)
+- `/data/esirtv.db`: history & favorites (SQLite)
+- `/data/fonts/*`: uploaded UI font files
 
-可选环境变量（见 `docker-compose.yml` / `DOCKER.md`）：
+### Environment Variables
 
-- `PORT`：服务端口（默认 `8080`）
-- `SETTINGS_FILE`：配置文件路径（默认 `/data/settings.json`）
-- `DB_FILE`：数据库路径（默认 `/data/esirtv.db`）
-- `TVBOX_CONFIG_URL`：直接注入数据源链接（优先级高于 `settings.json`）
-- `ESIRTV_CONFIG_URL`：同 `TVBOX_CONFIG_URL`（兼容别名）
+- `PORT`: server port (default `8080`)
+- `SETTINGS_FILE`: settings file path (default `/data/settings.json`)
+- `DB_FILE`: SQLite DB path (default `/data/esirtv.db`)
+- `TVBOX_CONFIG_URL`: inject TVBox config URL (overrides `settings.json`)
+- `ESIRTV_CONFIG_URL`: alias of `TVBOX_CONFIG_URL`
+- `FONTS_DIR`: font storage dir (default `/data/fonts`)
+- `WEB_ROOT`: override static web root (optional)
 
-## 前端开发（可选）
+## Local Development
 
-后端（本机）：
+Backend:
 
 ```bash
 node app/server/server.js
 ```
 
-前端（Vite，默认 `http://localhost:5173`，已代理 `/api` 到 `:8080`）：
+Frontend (Vite at `http://localhost:5173`, proxies `/api` to `:8080`):
 
 ```bash
 npm --prefix app/web install
 npm --prefix app/web run dev
 ```
 
-## 路由说明
+## Routes
 
-- `/`：海报墙
-- `/settings`：设置页
-- `/detail/:site/:vodId`：详情播放页
-- 兼容旧地址：`/settings.html`、`/detail.html?site=...&vod_id=...`
+- `/`: poster wall
+- `/settings`: settings
+- `/detail/:site/:vodId`: details & playback
+- Legacy routes still work: `/settings.html`, `/detail.html?site=...&vod_id=...`
 
-## 文档
+## Notes
 
-- Docker 详细说明：`DOCKER.md`
+- This project does **not** include or host any video content. It only consumes third-party TVBox-compatible sources configured by the user.
+- Browser decoding capability depends on the browser/device. For unsupported codecs/containers, consider server-side remux/transcode.
+
+## Docs
+
+- Docker guide: `DOCKER.md`
+
+## License
+
+MIT License. See `LICENSE`.
