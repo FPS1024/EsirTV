@@ -86,11 +86,12 @@ export const EsirtvApi = {
   getSettings() {
     return requestJson('/api/settings');
   },
-  saveSettings(configUrl) {
+  saveSettings(payload) {
+    const body = payload && typeof payload === 'object' ? payload : {};
     return requestJson('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ configUrl }),
+      body: JSON.stringify(body),
     });
   },
   testSettings(configUrl) {
@@ -100,5 +101,29 @@ export const EsirtvApi = {
       body: JSON.stringify({ configUrl }),
     });
   },
+  listFonts() {
+    return requestJson('/api/fonts');
+  },
+  async uploadFont(file, name = '') {
+    const filename = (name || (file && file.name) || '').trim();
+    if (!filename) {
+      throw new Error('文件名为空');
+    }
+    const res = await fetch(`/api/fonts/upload?name=${encodeURIComponent(filename)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: file,
+    });
+    const rawText = await res.text();
+    let data = {};
+    try {
+      data = rawText ? JSON.parse(rawText) : {};
+    } catch (_) {
+      data = { error: rawText || '响应解析失败' };
+    }
+    if (!res.ok) {
+      throw new Error(data.error || `上传失败(${res.status})`);
+    }
+    return data;
+  },
 };
-

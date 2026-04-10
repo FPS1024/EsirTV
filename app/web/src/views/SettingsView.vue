@@ -33,6 +33,42 @@
         class="mt-3 rounded-lg bg-slate-900 border border-slate-700 px-4 py-3 text-xs text-slate-300 whitespace-pre-wrap break-all"
       >{{ msg.detail }}</pre>
     </section>
+
+    <section class="glass-effect rounded-xl p-5 md:p-6 border border-slate-800 mt-6">
+      <h2 class="text-lg font-semibold mb-4">字体设置</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="fontSelect" class="block text-sm text-slate-300 mb-2">当前字体</label>
+          <select
+            id="fontSelect"
+            v-model="uiFont"
+            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2"
+          >
+            <option value="">默认（系统字体）</option>
+            <option v-for="f in fonts" :key="f.file" :value="f.file">{{ f.family }}（{{ f.file }}）</option>
+          </select>
+          <p class="text-slate-400 text-sm mt-2">
+            字体文件来源：容器内 `/data/fonts`（上传后自动持久化）。也支持随前端打包的内置字体。
+          </p>
+          <button @click="saveFontOnly" class="mt-3 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg">
+            保存字体选择
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">上传字体文件</label>
+          <input
+            ref="fontFileInput"
+            type="file"
+            accept=".woff2,.woff,.ttf,.otf"
+            class="block w-full text-sm text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700"
+            @change="onFontFileSelected"
+          />
+          <p class="text-slate-400 text-sm mt-2">支持：woff2 / woff / ttf / otf。</p>
+        </div>
+      </div>
+    </section>
   </main>
 </template>
 
@@ -41,6 +77,9 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { EsirtvApi } from '../lib/api.js';
 
 const configUrl = ref('');
+const uiFont = ref('');
+const fonts = ref([]);
+const fontFileInput = ref(null);
 const msg = reactive({ text: '', type: 'info', detail: '' });
 
 const msgClass = computed(() => {
@@ -60,8 +99,18 @@ async function loadSettings() {
   try {
     const data = await EsirtvApi.getSettings();
     configUrl.value = data.configUrl || '';
+    uiFont.value = data.uiFont || '';
   } catch (error) {
     setMessage(error?.message || '读取配置失败', 'error');
+  }
+}
+
+async function loadFonts() {
+  try {
+    const data = await EsirtvApi.listFonts();
+    fonts.value = Array.isArray(data.files) ? data.files : [];
+  } catch (error) {
+    setMessage(error?.message || '读取字体列表失败', 'error');
   }
 }
 
@@ -73,13 +122,22 @@ async function save(verify = false) {
   }
 
   try {
-    await EsirtvApi.saveSettings(value);
+    await EsirtvApi.saveSettings({ configUrl: value, uiFont: uiFont.value || '' });
     if (!verify) {
       setMessage('保存成功。');
       return;
     }
     const sitesData = await EsirtvApi.getSites();
     setMessage(`保存并验证成功，站点数量：${sitesData.length}`);
+  } catch (error) {
+    setMessage('保存失败', 'error', error?.message || '未知错误');
+  }
+}
+
+async function saveFontOnly() {
+  try {
+    await EsirtvApi.saveSettings({ uiFont: uiFont.value || '' });
+    setMessage('字体已保存。');
   } catch (error) {
     setMessage('保存失败', 'error', error?.message || '未知错误');
   }
@@ -101,6 +159,32 @@ async function testOnly() {
   }
 }
 
-onMounted(loadSettings);
-</script>
+async function onFontFileSelected(event) {
+  const file = event && event.target && event.target.files ? event.target.files[0] : null;
+  if (!file) {
+    return;
+  }
 
+  try {
+    const result = await EsirtvApi.uploadFont(file, file.name);
+    await loadFonts();
+    if (result && result.file) {
+      uiFont.value = result.file;
+      setMessage(`上传成功：${result.file}`);
+    } else {
+      setMessage('上传成功。');
+    }
+  } catch (error) {
+    setMessage('上传失败', 'error', error?.message || '未知错误');
+  } finally {
+    if (fontFileInput.value) {
+      fontFileInput.value.value = '';
+    }
+  }
+}
+
+onMounted(async () => {
+  await loadSettings();
+  await loadFonts();
+});
+</script>

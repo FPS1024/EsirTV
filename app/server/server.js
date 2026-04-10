@@ -12,6 +12,9 @@ const PORT = Number(process.env.PORT || process.env.APP_PORT || 8080);
 const SETTINGS_FILE = process.env.SETTINGS_FILE
   ? path.resolve(process.env.SETTINGS_FILE)
   : path.join(__dirname, '../settings.json');
+const FONTS_DIR = process.env.FONTS_DIR
+  ? path.resolve(process.env.FONTS_DIR)
+  : path.join(path.dirname(SETTINGS_FILE), 'fonts');
 function resolveWebRoot() {
   const candidates = [];
   if (process.env.WEB_ROOT) {
@@ -49,7 +52,7 @@ function isValidHttpUrl(value) {
 
 function readSettings() {
   if (!fs.existsSync(SETTINGS_FILE)) {
-    return { configUrl: '' };
+    return { configUrl: '', uiFont: '' };
   }
 
   try {
@@ -57,10 +60,11 @@ function readSettings() {
     const parsed = JSON.parse(raw);
     return {
       configUrl: typeof parsed.configUrl === 'string' ? parsed.configUrl.trim() : '',
+      uiFont: typeof parsed.uiFont === 'string' ? parsed.uiFont.trim() : '',
     };
   } catch (error) {
     console.error('读取 settings.json 失败:', error.message);
-    return { configUrl: '' };
+    return { configUrl: '', uiFont: '' };
   }
 }
 
@@ -82,6 +86,46 @@ function ensureParentDir(filePath) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
+}
+
+function ensureDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
+function getFontFormatByExt(ext) {
+  const lower = String(ext || '').toLowerCase();
+  if (lower === '.woff2') return 'woff2';
+  if (lower === '.woff') return 'woff';
+  if (lower === '.otf') return 'opentype';
+  if (lower === '.ttf') return 'truetype';
+  return '';
+}
+
+function isAllowedFontExt(ext) {
+  return ['.woff2', '.woff', '.ttf', '.otf'].includes(String(ext || '').toLowerCase());
+}
+
+function listFontFiles() {
+  function listFrom(dir) {
+    try {
+      if (!dir || !fs.existsSync(dir)) {
+        return [];
+      }
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      return entries
+        .filter((e) => e.isFile())
+        .map((e) => e.name)
+        .filter((name) => isAllowedFontExt(path.extname(name)));
+    } catch (_) {
+      return [];
+    }
+  }
+
+  const builtinDir = WEB_ROOT ? path.join(WEB_ROOT, 'fonts') : '';
+  const all = [...listFrom(builtinDir), ...listFrom(FONTS_DIR)];
+  return Array.from(new Set(all));
 }
 
 function createDatabase() {
@@ -434,21 +478,46 @@ app.get('/api/settings', (req, res) => {
 });
 
 app.post('/api/settings', (req, res) => {
-  const configUrl = typeof req.body.configUrl === 'string' ? req.body.configUrl.trim() : '';
+  const hasConfigUrl = typeof req.body.configUrl === 'string';
+  const configUrl = hasConfigUrl ? req.body.configUrl.trim() : '';
+  const hasUiFont = typeof req.body.uiFont === 'string';
+  const uiFont = hasUiFont ? req.body.uiFont.trim() : '';
 
-  if (!configUrl) {
-    return res.status(400).json({ error: 'configUrl 不能为空' });
+  if (!hasConfigUrl && !hasUiFont) {
+    return res.status(400).json({ error: 'configUrl 或 uiFont 至少提供一个' });
   }
 
-  if (!isValidHttpUrl(configUrl)) {
-    return res.status(400).json({ error: 'configUrl 必须是 http/https 链接' });
+  if (hasConfigUrl) {
+    if (!configUrl) {
+      return res.status(400).json({ error: 'configUrl 不能为空' });
+    }
+    if (!isValidHttpUrl(configUrl)) {
+      return res.status(400).json({ error: 'configUrl 必须是 http/https 链接' });
+    }
+  }
+
+  if (hasUiFont && uiFont) {
+    const normalized = path.basename(uiFont);
+    const ext = path.extname(normalized);
+    if (!isAllowedFontExt(ext)) {
+      return res.status(400).json({ error: 'uiFont 不支持该文件类型（仅 woff2/woff/ttf/otf）' });
+    }
+    const exists = listFontFiles().includes(normalized);
+    if (!exists) {
+      return res.status(400).json({ error: 'uiFont 指定的字体文件不存在，请先上传或放入字体目录' });
+    }
   }
 
   try {
-    writeSettings({ configUrl });
+    const current = readSettings();
+    writeSettings({
+      configUrl: hasConfigUrl ? configUrl : current.configUrl,
+      uiFont: hasUiFont ? uiFont : current.uiFont,
+    });
     sitesCache = null;
     sitesCacheTime = 0;
-    res.json({ success: true, configUrl });
+    const latest = readSettings();
+    res.json({ success: true, configUrl: latest.configUrl, uiFont: latest.uiFont });
   } catch (error) {
     res.status(500).json({ error: `保存配置失败: ${error.message}` });
   }
@@ -857,6 +926,63 @@ app.get('/api/image', (req, res) => {
 
   streamImageResponse(imageUrl, res);
 });
+
+app.get('/api/fonts', (req, res) => {
+  const files = listFontFiles();
+  res.json({
+    dir: FONTS_DIR,
+    files: files.map((file) => ({
+      file,
+      family: path.basename(file, path.extname(file)),
+      ext: path.extname(file),
+      format: getFontFormatByExt(path.extname(file)),
+      url: `/fonts/${encodeURIComponent(file)}`,
+    })),
+  });
+});
+
+app.post(
+  '/api/fonts/upload',
+  express.raw({ type: 'application/octet-stream', limit: '30mb' }),
+  (req, res) => {
+    try {
+      const nameRaw = typeof req.query.name === 'string' ? req.query.name : '';
+      const safeName = path.basename(nameRaw || '');
+      if (!safeName) {
+        return res.status(400).json({ error: 'name 参数缺失' });
+      }
+
+      const ext = path.extname(safeName);
+      if (!isAllowedFontExt(ext)) {
+        return res.status(400).json({ error: '仅支持 woff2/woff/ttf/otf 字体文件' });
+      }
+
+      const body = req.body;
+      if (!body || !(body instanceof Buffer) || body.length === 0) {
+        return res.status(400).json({ error: '未读取到字体文件内容' });
+      }
+
+      ensureDir(FONTS_DIR);
+      const targetPath = path.join(FONTS_DIR, safeName);
+      fs.writeFileSync(targetPath, body);
+
+      return res.json({
+        success: true,
+        file: safeName,
+        family: path.basename(safeName, ext),
+        url: `/fonts/${encodeURIComponent(safeName)}`,
+      });
+    } catch (error) {
+      return res.status(500).json({ error: `上传字体失败: ${error.message}` });
+    }
+  },
+);
+
+ensureDir(FONTS_DIR);
+if (WEB_ROOT) {
+  app.use('/fonts', express.static(path.join(WEB_ROOT, 'fonts'), { fallthrough: true }));
+}
+app.use('/fonts', express.static(FONTS_DIR));
 
 if (WEB_ROOT) {
   app.use(express.static(WEB_ROOT));
