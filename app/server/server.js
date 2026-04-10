@@ -52,7 +52,7 @@ function isValidHttpUrl(value) {
 
 function readSettings() {
   if (!fs.existsSync(SETTINGS_FILE)) {
-    return { configUrl: '', uiFont: '' };
+    return { configUrl: '', uiFont: '', uiLang: '' };
   }
 
   try {
@@ -61,10 +61,11 @@ function readSettings() {
     return {
       configUrl: typeof parsed.configUrl === 'string' ? parsed.configUrl.trim() : '',
       uiFont: typeof parsed.uiFont === 'string' ? parsed.uiFont.trim() : '',
+      uiLang: typeof parsed.uiLang === 'string' ? parsed.uiLang.trim() : '',
     };
   } catch (error) {
     console.error('读取 settings.json 失败:', error.message);
-    return { configUrl: '', uiFont: '' };
+    return { configUrl: '', uiFont: '', uiLang: '' };
   }
 }
 
@@ -482,9 +483,11 @@ app.post('/api/settings', (req, res) => {
   const configUrl = hasConfigUrl ? req.body.configUrl.trim() : '';
   const hasUiFont = typeof req.body.uiFont === 'string';
   const uiFont = hasUiFont ? req.body.uiFont.trim() : '';
+  const hasUiLang = typeof req.body.uiLang === 'string';
+  const uiLang = hasUiLang ? req.body.uiLang.trim() : '';
 
-  if (!hasConfigUrl && !hasUiFont) {
-    return res.status(400).json({ error: 'configUrl 或 uiFont 至少提供一个' });
+  if (!hasConfigUrl && !hasUiFont && !hasUiLang) {
+    return res.status(400).json({ error: 'configUrl 或 uiFont 或 uiLang 至少提供一个' });
   }
 
   if (hasConfigUrl) {
@@ -508,16 +511,29 @@ app.post('/api/settings', (req, res) => {
     }
   }
 
+  if (hasUiLang && uiLang) {
+    const allowed = ['zh-CN', 'en-US', 'ug-CN'];
+    if (!allowed.includes(uiLang)) {
+      return res.status(400).json({ error: 'uiLang 不支持（仅 zh-CN/en-US/ug-CN）' });
+    }
+  }
+
   try {
     const current = readSettings();
     writeSettings({
       configUrl: hasConfigUrl ? configUrl : current.configUrl,
       uiFont: hasUiFont ? uiFont : current.uiFont,
+      uiLang: hasUiLang ? uiLang : current.uiLang,
     });
     sitesCache = null;
     sitesCacheTime = 0;
     const latest = readSettings();
-    res.json({ success: true, configUrl: latest.configUrl, uiFont: latest.uiFont });
+    res.json({
+      success: true,
+      configUrl: latest.configUrl,
+      uiFont: latest.uiFont,
+      uiLang: latest.uiLang,
+    });
   } catch (error) {
     res.status(500).json({ error: `保存配置失败: ${error.message}` });
   }

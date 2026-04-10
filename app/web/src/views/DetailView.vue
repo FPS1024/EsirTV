@@ -2,10 +2,10 @@
   <main class="max-w-7xl mx-auto p-4 md:p-6">
     <div class="mb-4 flex items-center justify-between gap-3">
       <router-link :to="backHomeTo" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg">
-        <i class="fa-solid fa-arrow-left"></i>返回
+        <i class="fa-solid fa-arrow-left"></i>{{ t('common.back') }}
       </router-link>
       <router-link to="/settings" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg text-sm">
-        <i class="fa-solid fa-gear"></i>设置
+        <i class="fa-solid fa-gear"></i>{{ t('common.settings') }}
       </router-link>
     </div>
 
@@ -28,17 +28,17 @@
               @click="toggleFavorite"
             >
               <i :class="favorited ? 'fa-solid fa-star text-amber-400' : 'fa-regular fa-star'"></i>
-              <span>{{ favorited ? '已收藏' : '收藏' }}</span>
+              <span>{{ favorited ? t('detail.favorited') : t('detail.favorite') }}</span>
             </button>
           </div>
           <p class="text-slate-400 mb-4">{{ meta }}</p>
 
           <div class="glass-effect rounded-xl p-5 mb-6 border border-slate-800">
-            <h2 class="text-lg font-semibold mb-2">简介</h2>
+            <h2 class="text-lg font-semibold mb-2">{{ t('detail.intro') }}</h2>
             <p class="text-slate-300 leading-7 whitespace-pre-wrap">{{ desc }}</p>
           </div>
 
-          <h2 class="text-lg font-semibold mb-3">线路</h2>
+          <h2 class="text-lg font-semibold mb-3">{{ t('detail.lines') }}</h2>
           <div class="flex flex-wrap gap-2 mb-6">
             <button
               v-for="(s, idx) in sources"
@@ -51,7 +51,7 @@
             </button>
           </div>
 
-          <h2 class="text-lg font-semibold mb-3">选集</h2>
+          <h2 class="text-lg font-semibold mb-3">{{ t('detail.episodes') }}</h2>
           <div class="flex flex-wrap gap-2">
             <button
               v-for="(ep, idx) in currentEpisodes"
@@ -62,20 +62,20 @@
             >
               {{ ep.name || `第${idx + 1}集` }}
             </button>
-            <span v-if="currentEpisodes.length === 0" class="text-slate-400">该线路暂无可播放选集</span>
+            <span v-if="currentEpisodes.length === 0" class="text-slate-400">{{ t('detail.noEpisodes') }}</span>
           </div>
         </div>
 
         <aside>
           <div class="glass-effect rounded-xl p-5 border border-slate-800">
-            <h2 class="text-lg font-semibold mb-2">播放信息</h2>
+            <h2 class="text-lg font-semibold mb-2">{{ t('detail.playInfo') }}</h2>
             <p class="text-slate-300 text-sm">{{ playInfo }}</p>
           </div>
         </aside>
       </div>
 
       <div v-else class="text-center text-slate-400 py-8">
-        <i class="fa-solid fa-spinner fa-spin mr-2"></i>加载中...
+        <i class="fa-solid fa-spinner fa-spin mr-2"></i>{{ t('common.loading') }}
       </div>
     </section>
   </main>
@@ -83,6 +83,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { EsirtvApi } from '../lib/api.js';
 import { createVideoPlayer, parseSources } from '../lib/player.js';
@@ -93,6 +94,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const { t } = useI18n({ useScope: 'global' });
 
 const SAVE_INTERVAL_MS = 5000;
 
@@ -111,7 +113,7 @@ const sources = ref([]);
 const sourceIndex = ref(0);
 const selectedEpisodeName = ref('');
 const selectedPlayUrl = ref('');
-const playInfo = ref('加载中...');
+const playInfo = ref('');
 
 const playerEl = ref(null);
 let player = null;
@@ -210,7 +212,7 @@ function selectEpisode(ep, resumeEntry = null) {
   }
   selectedEpisodeName.value = ep.name || '';
   selectedPlayUrl.value = ep.url;
-  playInfo.value = `当前播放：${ep.name || '未命名'}`;
+  playInfo.value = t('detail.currentPlay', { name: ep.name || 'N/A' });
 
   const resumeSec = resumeEntry ? Number(resumeEntry.progressSec || 0) : 0;
   player?.play(ep.url, resumeSec);
@@ -229,14 +231,15 @@ function bindPlayerEvents() {
 
 async function init() {
   if (!props.site || !props.vodId) {
-    errorMsg.value = '缺少 site 或 vodId 参数，无法加载详情。';
+    errorMsg.value = t('detail.missingParams');
     return;
   }
 
   try {
+    playInfo.value = t('common.loading');
     const el = playerEl.value;
     if (!el) {
-      throw new Error('播放器初始化失败');
+      throw new Error(t('detail.playerInitFailed'));
     }
     player = createVideoPlayer(el, (msg) => {
       playInfo.value = msg;
@@ -255,7 +258,7 @@ async function init() {
 
     sources.value = parseSources(data.vod_play_from, data.vod_play_url);
     if (sources.value.length === 0) {
-      throw new Error('该视频暂无可用播放线路');
+      throw new Error(t('detail.noLines'));
     }
 
     await refreshFavoriteState();

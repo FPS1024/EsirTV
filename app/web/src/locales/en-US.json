@@ -1,0 +1,61 @@
+{
+  "app": {
+    "title": "EsirTV"
+  },
+  "common": {
+    "settings": "Settings",
+    "search": "Search",
+    "clearSearch": "Clear",
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "autoLoading": "Auto loading...",
+    "clickDetail": "Open details",
+    "save": "Save",
+    "back": "Back",
+    "page": "Page {current} / {total}",
+    "missingParams": "Missing parameters",
+    "notFoundTitle": "Page not found",
+    "notFoundDesc": "The page you are looking for does not exist.",
+    "backHome": "Back to Home"
+  },
+  "home": {
+    "history": "History",
+    "favorites": "Favorites",
+    "featured": "Featured",
+    "myFavorites": "My Favorites",
+    "searchResults": "Search: {keyword}"
+  },
+  "detail": {
+    "intro": "Overview",
+    "lines": "Sources",
+    "episodes": "Episodes",
+    "playInfo": "Playback",
+    "favorited": "Saved",
+    "favorite": "Save",
+    "noEpisodes": "No playable episodes for this source",
+    "noLines": "No available sources",
+    "currentPlay": "Now playing: {name}",
+    "missingParams": "Missing site or vodId.",
+    "playerInitFailed": "Failed to initialize player"
+  },
+  "settings": {
+    "title": "Source Settings",
+    "tvboxLabel": "TVBox Config URL",
+    "tvboxDesc": "After saving, the home page will load sites from this URL.",
+    "saveConfig": "Save",
+    "saveVerify": "Save & Verify",
+    "testOnly": "Test URL",
+    "fontTitle": "Font",
+    "currentFont": "Current font",
+    "defaultFont": "Default (System)",
+    "saveFont": "Save font",
+    "uploadFont": "Upload font",
+    "fontHint": "Supported: woff2 / woff / ttf / otf.",
+    "langTitle": "Language",
+    "langLabel": "UI language",
+    "langZh": "简体中文",
+    "langEn": "English",
+    "langUg": "ئۇيغۇرچە"
+  }
+}
+

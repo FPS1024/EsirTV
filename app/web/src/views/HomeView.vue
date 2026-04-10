@@ -7,7 +7,7 @@
             class="text-2xl font-bold tracking-wide bg-gradient-to-r from-cyan-300 via-sky-300 to-blue-500 bg-clip-text text-transparent cursor-pointer select-none"
             @click="resetHome"
           >
-            EsirTV
+            {{ t('app.title') }}
           </h1>
           <div class="hidden md:block text-slate-400 text-sm truncate">
             {{ currentTypeName }}
@@ -30,16 +30,16 @@
               v-model.trim="keyword"
               @keyup.enter="searchMovies"
               type="text"
-              placeholder="搜索影片..."
+              :placeholder="t('common.search') + '...'"
               class="bg-transparent py-2 px-3 text-sm w-32 sm:w-44 md:w-64 focus:outline-none"
             />
             <button @click="searchMovies" class="bg-blue-600 hover:bg-blue-500 px-3 py-2 text-sm">
-              <i class="fa-solid fa-magnifying-glass mr-1"></i>搜索
+              <i class="fa-solid fa-magnifying-glass mr-1"></i>{{ t('common.search') }}
             </button>
           </div>
           <router-link to="/settings" class="bg-black/30 hover:bg-black/40 border border-white/10 px-3 py-2 rounded-lg text-sm">
             <i class="fa-solid fa-gear"></i>
-            <span class="hidden md:inline ml-1">设置</span>
+            <span class="hidden md:inline ml-1">{{ t('common.settings') }}</span>
           </router-link>
         </div>
       </div>
@@ -52,14 +52,14 @@
             :class="currentType === HISTORY_TYPE_ID ? 'text-white border-blue-500' : 'text-slate-300 border-transparent hover:text-white'"
             @click="filterType(HISTORY_TYPE_ID)"
           >
-            <i class="fa-solid fa-clock-rotate-left mr-1"></i>历史记录
+            <i class="fa-solid fa-clock-rotate-left mr-1"></i>{{ t('home.history') }}
           </button>
           <button
             class="text-sm tracking-wide transition border-b-2 pb-1"
             :class="currentType === FAVORITES_TYPE_ID ? 'text-white border-blue-500' : 'text-slate-300 border-transparent hover:text-white'"
             @click="filterType(FAVORITES_TYPE_ID)"
           >
-            <i class="fa-solid fa-star mr-1"></i>收藏
+            <i class="fa-solid fa-star mr-1"></i>{{ t('home.favorites') }}
           </button>
         </div>
       </div>
@@ -84,19 +84,19 @@
       <div class="max-w-screen-2xl mx-auto p-4 md:p-6">
       <div v-if="errorMsg" class="mb-4 rounded-lg border border-amber-600/40 bg-amber-950/30 px-4 py-3 text-amber-200">
         {{ errorMsg }}
-        <router-link to="/settings" class="underline ml-2">去设置</router-link>
+        <router-link to="/settings" class="underline ml-2">{{ t('common.settings') }}</router-link>
       </div>
 
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-xl md:text-2xl font-semibold">{{ currentTypeName }}</h2>
         <div class="flex items-center gap-2">
           <span v-if="searchMode" class="text-xs md:text-sm px-2 py-1 rounded bg-blue-500/20 border border-blue-500/30 text-blue-200">
-            搜索中：{{ activeKeyword }}
+            {{ t('home.searchResults', { keyword: activeKeyword }) }}
           </span>
           <button v-if="searchMode" @click="clearSearch" class="text-xs md:text-sm px-2 py-1 rounded bg-slate-800 hover:bg-slate-700">
-            清空搜索
+            {{ t('common.clearSearch') }}
           </button>
-          <div class="text-slate-400 text-sm">第 {{ currentPage }} / {{ pagecount }} 页</div>
+          <div class="text-slate-400 text-sm">{{ t('common.page', { current: currentPage, total: pagecount }) }}</div>
         </div>
       </div>
 
@@ -116,14 +116,14 @@
       </div>
 
       <div v-if="isLoading" class="text-center text-slate-400 py-8">
-        <i class="fa-solid fa-spinner fa-spin mr-2"></i>加载中...
+        <i class="fa-solid fa-spinner fa-spin mr-2"></i>{{ t('common.loading') }}
       </div>
 
       <div v-if="!isLoading && hasMore" class="text-center py-8">
         <button v-if="!autoLoadSupported" @click="loadMore" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg">
-          加载更多
+          {{ t('common.loadMore') }}
         </button>
-        <p v-else class="text-slate-400 text-sm">正在自动加载更多...</p>
+        <p v-else class="text-slate-400 text-sm">{{ t('common.autoLoading') }}</p>
       </div>
       <div ref="loadMoreSentinel" class="h-2"></div>
       </div>
@@ -133,12 +133,14 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { EsirtvApi } from '../lib/api.js';
 import { getJSON, setJSON } from '../lib/storage.js';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n({ useScope: 'global' });
 
 const HOME_STATE_KEY = 'esirtv.homeState';
 const HOME_SAVE_DELAY_MS = 200;
@@ -166,16 +168,16 @@ let saveTimer = null;
 
 const currentTypeName = computed(() => {
   if (searchMode.value) {
-    return `搜索结果：${activeKeyword.value}`;
+    return t('home.searchResults', { keyword: activeKeyword.value });
   }
   if (currentType.value === HISTORY_TYPE_ID) {
-    return '历史记录';
+    return t('home.history');
   }
   if (currentType.value === FAVORITES_TYPE_ID) {
-    return '我的收藏';
+    return t('home.myFavorites');
   }
   const target = types.value.find((item) => Number(item.type_id) === Number(currentType.value));
-  return target ? `${target.type_name} 精选` : '精选';
+  return target ? `${target.type_name} ${t('home.featured')}` : t('home.featured');
 });
 
 function remapPosterIfNeeded(list) {
@@ -527,7 +529,7 @@ async function init() {
 
     await loadCurrentList(1, false);
   } catch (error) {
-    errorMsg.value = error?.message || '加载失败，请先到设置页配置数据源链接。';
+    errorMsg.value = error?.message || t('settings.tvboxDesc');
   }
 }
 

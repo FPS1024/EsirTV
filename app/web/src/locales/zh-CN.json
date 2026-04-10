@@ -1,0 +1,60 @@
+{
+  "app": {
+    "title": "EsirTV"
+  },
+  "common": {
+    "settings": "设置",
+    "search": "搜索",
+    "clearSearch": "清空搜索",
+    "loading": "加载中...",
+    "loadMore": "加载更多",
+    "autoLoading": "正在自动加载更多...",
+    "clickDetail": "点击查看详情",
+    "save": "保存",
+    "back": "返回",
+    "page": "第 {current} / {total} 页",
+    "missingParams": "参数缺失",
+    "notFoundTitle": "页面不存在",
+    "notFoundDesc": "你访问的地址不存在或已被迁移。",
+    "backHome": "返回首页"
+  },
+  "home": {
+    "history": "历史记录",
+    "favorites": "收藏",
+    "featured": "精选",
+    "myFavorites": "我的收藏",
+    "searchResults": "搜索结果：{keyword}"
+  },
+  "detail": {
+    "intro": "简介",
+    "lines": "线路",
+    "episodes": "选集",
+    "playInfo": "播放信息",
+    "favorited": "已收藏",
+    "favorite": "收藏",
+    "noEpisodes": "该线路暂无可播放选集",
+    "noLines": "该视频暂无可用播放线路",
+    "currentPlay": "当前播放：{name}",
+    "missingParams": "缺少 site 或 vodId 参数，无法加载详情。",
+    "playerInitFailed": "播放器初始化失败"
+  },
+  "settings": {
+    "title": "数据源设置",
+    "tvboxLabel": "TVBox 配置链接",
+    "tvboxDesc": "保存后首页会从该链接拉取站点列表。",
+    "saveConfig": "保存配置",
+    "saveVerify": "保存并验证",
+    "testOnly": "仅测试链接",
+    "fontTitle": "字体设置",
+    "currentFont": "当前字体",
+    "defaultFont": "默认（系统字体）",
+    "saveFont": "保存字体选择",
+    "uploadFont": "上传字体文件",
+    "fontHint": "支持：woff2 / woff / ttf / otf。",
+    "langTitle": "语言设置",
+    "langLabel": "界面语言",
+    "langZh": "中文（简体）",
+    "langEn": "English",
+    "langUg": "维吾尔语"
+  }
+}
