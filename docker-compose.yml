@@ -10,8 +10,8 @@ services:
       PORT: 8080
       SETTINGS_FILE: /data/settings.json
       DB_FILE: /data/esirtv.db
-      # 可选：直接注入 TVBox 配置链接，优先级高于 settings.json
-      # TVBOX_CONFIG_URL: https://example.com/tvbox.json
+      # 可选：直接注入数据源配置链接，优先级高于 settings.json
+      # TVBOX_CONFIG_URL: https://v.esirtv.com/XXXXXXXXXXXXX
     volumes:
       - esirtv-data:/data
     restart: unless-stopped

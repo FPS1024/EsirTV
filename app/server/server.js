@@ -12,7 +12,28 @@ const PORT = Number(process.env.PORT || process.env.APP_PORT || 8080);
 const SETTINGS_FILE = process.env.SETTINGS_FILE
   ? path.resolve(process.env.SETTINGS_FILE)
   : path.join(__dirname, '../settings.json');
-const WEB_ROOT = path.join(__dirname, '../www');
+function resolveWebRoot() {
+  const candidates = [];
+  if (process.env.WEB_ROOT) {
+    candidates.push(path.resolve(process.env.WEB_ROOT));
+  }
+  candidates.push(path.join(__dirname, '../web/dist'));
+  candidates.push(path.join(__dirname, '../www'));
+
+  for (const candidate of candidates) {
+    try {
+      if (candidate && fs.existsSync(candidate)) {
+        return candidate;
+      }
+    } catch (_) {
+      // ignore
+    }
+  }
+
+  return null;
+}
+
+const WEB_ROOT = resolveWebRoot();
 const DB_FILE = process.env.DB_FILE
   ? path.resolve(process.env.DB_FILE)
   : path.join(path.dirname(SETTINGS_FILE), 'esirtv.db');
@@ -143,7 +164,12 @@ function mapFavoriteRow(row) {
 }
 
 function getConfigUrl() {
-  const envUrl = (process.env.TVBOX_CONFIG_URL || '').trim();
+  const envUrl = (
+    process.env.TVBOX_CONFIG_URL
+    || process.env.ESIRTV_CONFIG_URL
+    || process.env.EsirTV_CONFIG_URL
+    || ''
+  ).trim();
   if (envUrl) {
     return envUrl;
   }
@@ -832,10 +858,32 @@ app.get('/api/image', (req, res) => {
   streamImageResponse(imageUrl, res);
 });
 
-app.use(express.static(WEB_ROOT));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(WEB_ROOT, 'index.html'));
-});
+if (WEB_ROOT) {
+  app.use(express.static(WEB_ROOT));
+
+  // SPA fallback: keep old multi-page URLs working, and allow Vue Router history mode.
+  app.get('*', (req, res, next) => {
+    if (req.method !== 'GET') {
+      return next();
+    }
+    if (req.path === '/api' || req.path.startsWith('/api/')) {
+      return next();
+    }
+
+    const ext = path.extname(req.path).toLowerCase();
+    if (ext && ext !== '.html') {
+      return next();
+    }
+
+    const indexPath = path.join(WEB_ROOT, 'index.html');
+    if (!fs.existsSync(indexPath)) {
+      return next();
+    }
+    return res.sendFile(indexPath);
+  });
+} else {
+  console.warn('未找到前端静态资源目录（web/dist 或 www 不存在），仅提供 API 服务。');
+}
 
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);

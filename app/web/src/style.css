@@ -1,0 +1,147 @@
+[v-cloak] {
+  display: none;
+}
+
+body {
+  background-color: #020617;
+  color: #ffffff;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.es-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.es-posters-track {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 14px;
+  padding: 16px 0 20px;
+}
+
+.es-poster-card {
+  flex: 0 0 auto;
+  width: 180px;
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease;
+  position: relative;
+}
+
+.es-poster-card:hover {
+  transform: scale(1.12);
+  z-index: 10;
+}
+
+.es-poster-img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+  background: #000;
+  display: block;
+}
+
+.es-poster-info {
+  margin-top: 10px;
+}
+
+.es-movie-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .es-poster-card {
+    width: 130px;
+  }
+}
+
+.es-poster-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 10px 0 20px;
+}
+
+.es-grid-card {
+  cursor: pointer;
+  transition: transform 0.25s ease;
+  position: relative;
+}
+
+.es-grid-card:hover {
+  transform: scale(1.08);
+  z-index: 10;
+}
+
+.es-grid-img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+  background: #000;
+  display: block;
+}
+
+.es-grid-info {
+  margin-top: 10px;
+}
+
+.es-grid-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+
+@media (min-width: 640px) {
+  .es-poster-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .es-poster-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .es-poster-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .es-poster-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
