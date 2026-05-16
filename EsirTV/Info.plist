@@ -34,7 +34,7 @@
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>EsirTV 需要访问局域网或本地 HTTP 影视源配置。</string>
+	<string>EsirTV 需要访问局域网以发现 DLNA 电视、加载本地影视源并投屏播放。</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

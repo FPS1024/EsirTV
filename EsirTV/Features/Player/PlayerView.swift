@@ -14,6 +14,7 @@ struct PlayerView: View {
 
     @Environment(\.dismiss) private var dismiss
     @StateObject private var playerHolder = PlayerHolder()
+    @State private var showCastPicker = false
 
     var body: some View {
         ZStack {
@@ -37,6 +38,15 @@ struct PlayerView: View {
                             .foregroundStyle(.white, .black.opacity(0.4))
                     }
                     Spacer()
+                    if streamURL != nil {
+                        Button {
+                            showCastPicker = true
+                        } label: {
+                            Image(systemName: "airplayvideo")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                        }
+                    }
                 }
                 .padding()
                 Spacer()
@@ -49,6 +59,14 @@ struct PlayerView: View {
         }
         .onDisappear {
             playerHolder.stop()
+        }
+        .sheet(isPresented: $showCastPicker) {
+            if let streamURL {
+                CastDevicePickerView(
+                    mediaURL: streamURL,
+                    title: episodeTitle.map { "\(title) · \($0)" } ?? title
+                )
+            }
         }
     }
 

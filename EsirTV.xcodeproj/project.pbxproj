@@ -45,6 +45,12 @@
 		8AB3AC2A2FB8C1000A6A3FC /* TVBoxAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC2B2FB8C1000A6A3FC /* TVBoxAPIService.swift */; };
 		8AB3AC2C2FB8C1000A6A3FC /* RemotePosterImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC2D2FB8C1000A6A3FC /* RemotePosterImage.swift */; };
 		8ADD1E2C2FB8B415009016AA /* build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 8ADD1E2B2FB8B415009016AA /* build.sh */; };
+		8AB3AC402FB8E0000A6A3FC /* DLNADevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC502FB8E0000A6A3FC /* DLNADevice.swift */; };
+		8AB3AC412FB8E0000A6A3FC /* UPnPXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC512FB8E0000A6A3FC /* UPnPXMLParser.swift */; };
+		8AB3AC422FB8E0000A6A3FC /* SSDPDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC522FB8E0000A6A3FC /* SSDPDiscovery.swift */; };
+		8AB3AC432FB8E0000A6A3FC /* DLNACastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC532FB8E0000A6A3FC /* DLNACastService.swift */; };
+		8AB3AC442FB8E0000A6A3FC /* DLNAManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC542FB8E0000A6A3FC /* DLNAManager.swift */; };
+		8AB3AC452FB8E0000A6A3FC /* CastDevicePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC552FB8E0000A6A3FC /* CastDevicePickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +94,12 @@
 		8AB3AC382FB8C4000A6A3FC /* VodDetailCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VodDetailCache.swift; sourceTree = "<group>"; };
 		8AB3AC3A2FB8C4000A6A3FC /* ScrollOffsetReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetReader.swift; sourceTree = "<group>"; };
 		8ADD1E2B2FB8B415009016AA /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		8AB3AC502FB8E0000A6A3FC /* DLNADevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DLNADevice.swift; sourceTree = "<group>"; };
+		8AB3AC512FB8E0000A6A3FC /* UPnPXMLParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UPnPXMLParser.swift; sourceTree = "<group>"; };
+		8AB3AC522FB8E0000A6A3FC /* SSDPDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSDPDiscovery.swift; sourceTree = "<group>"; };
+		8AB3AC532FB8E0000A6A3FC /* DLNACastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DLNACastService.swift; sourceTree = "<group>"; };
+		8AB3AC542FB8E0000A6A3FC /* DLNAManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DLNAManager.swift; sourceTree = "<group>"; };
+		8AB3AC552FB8E0000A6A3FC /* CastDevicePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastDevicePickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,10 +159,23 @@
 				8AB3AB7E2FB8A9000A6A3FC /* Models */,
 				8AB3AC2E2FB8C1000A6A3FC /* Networking */,
 				8AB3AC182FB8B5000A6A3FC /* Services */,
+				8AB3AC462FB8E0000A6A3FC /* DLNA */,
 				8AB3AB7F2FB8A9000A6A3FC /* Theme */,
 				8AB3AB802FB8A9000A6A3FC /* Navigation */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		8AB3AC462FB8E0000A6A3FC /* DLNA */ = {
+			isa = PBXGroup;
+			children = (
+				8AB3AC502FB8E0000A6A3FC /* DLNADevice.swift */,
+				8AB3AC512FB8E0000A6A3FC /* UPnPXMLParser.swift */,
+				8AB3AC522FB8E0000A6A3FC /* SSDPDiscovery.swift */,
+				8AB3AC532FB8E0000A6A3FC /* DLNACastService.swift */,
+				8AB3AC542FB8E0000A6A3FC /* DLNAManager.swift */,
+			);
+			path = DLNA;
 			sourceTree = "<group>";
 		};
 		8AB3AB7C2FB8A9000A6A3FC /* Features */ = {
@@ -159,11 +184,20 @@
 				8AB3AB812FB8A9000A6A3FC /* Home */,
 				8AB3AC192FB8B5000A6A3FC /* Detail */,
 				8AB3AC1A2FB8B5000A6A3FC /* Player */,
+				8AB3AC472FB8E0000A6A3FC /* Cast */,
 				8AB3AB822FB8A9000A6A3FC /* History */,
 				8AB3AB832FB8A9000A6A3FC /* Favorites */,
 				8AB3AB842FB8A9000A6A3FC /* Settings */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		8AB3AC472FB8E0000A6A3FC /* Cast */ = {
+			isa = PBXGroup;
+			children = (
+				8AB3AC552FB8E0000A6A3FC /* CastDevicePickerView.swift */,
+			);
+			path = Cast;
 			sourceTree = "<group>";
 		};
 		8AB3AB7D2FB8A9000A6A3FC /* Components */ = {
@@ -389,6 +423,12 @@
 				8AB3AC052FB8B5000A6A3FC /* MediaDetailView.swift in Sources */,
 				8AB3AC062FB8B5000A6A3FC /* MediaDetailViewModel.swift in Sources */,
 				8AB3AC072FB8B5000A6A3FC /* PlayerView.swift in Sources */,
+				8AB3AC402FB8E0000A6A3FC /* DLNADevice.swift in Sources */,
+				8AB3AC412FB8E0000A6A3FC /* UPnPXMLParser.swift in Sources */,
+				8AB3AC422FB8E0000A6A3FC /* SSDPDiscovery.swift in Sources */,
+				8AB3AC432FB8E0000A6A3FC /* DLNACastService.swift in Sources */,
+				8AB3AC442FB8E0000A6A3FC /* DLNAManager.swift in Sources */,
+				8AB3AC452FB8E0000A6A3FC /* CastDevicePickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,7 +560,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"EsirTV/Preview Content\"";
 				DEVELOPMENT_TEAM = 7JU26R7558;
 				ENABLE_PREVIEWS = YES;
@@ -546,7 +586,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"EsirTV/Preview Content\"";
 				DEVELOPMENT_TEAM = 7JU26R7558;
 				ENABLE_PREVIEWS = YES;
