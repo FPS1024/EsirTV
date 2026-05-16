@@ -9,6 +9,15 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
 
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        UITabBar.appearance().standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    }
+
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
@@ -27,6 +36,8 @@ struct MainTabView: View {
                 .tabItem { tabLabel(for: .settings) }
                 .tag(AppTab.settings)
         }
+        .toolbarBackground(.visible, for: .tabBar)
+        .toolbarBackground(Color(.systemBackground), for: .tabBar)
     }
 
     @ViewBuilder

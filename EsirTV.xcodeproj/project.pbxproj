@@ -35,6 +35,10 @@
 		8AB3AC202FB8C1000A6A3FC /* TVBoxHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC212FB8C1000A6A3FC /* TVBoxHTTPClient.swift */; };
 		8AB3AC222FB8C1000A6A3FC /* FlexibleJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC232FB8C1000A6A3FC /* FlexibleJSON.swift */; };
 		8AB3AC312FB8C3000A6A3FC /* RawHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC322FB8C3000A6A3FC /* RawHTTPClient.swift */; };
+		8AB3AC332FB8C4000A6A3FC /* HTTPRequestCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC342FB8C4000A6A3FC /* HTTPRequestCoordinator.swift */; };
+		8AB3AC352FB8C4000A6A3FC /* HomeFeedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC362FB8C4000A6A3FC /* HomeFeedCache.swift */; };
+		8AB3AC372FB8C4000A6A3FC /* VodDetailCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC382FB8C4000A6A3FC /* VodDetailCache.swift */; };
+		8AB3AC392FB8C4000A6A3FC /* ScrollOffsetReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC3A2FB8C4000A6A3FC /* ScrollOffsetReader.swift */; };
 		8AB3AC242FB8C1000A6A3FC /* VodDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC252FB8C1000A6A3FC /* VodDetail.swift */; };
 		8AB3AC262FB8C1000A6A3FC /* PlaySource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC272FB8C1000A6A3FC /* PlaySource.swift */; };
 		8AB3AC282FB8C1000A6A3FC /* ConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB3AC292FB8C1000A6A3FC /* ConfigStore.swift */; };
@@ -79,6 +83,10 @@
 		8AB3AC2D2FB8C1000A6A3FC /* RemotePosterImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePosterImage.swift; sourceTree = "<group>"; };
 		8AB3AC302FB8C2000A6A3FC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8AB3AC322FB8C3000A6A3FC /* RawHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawHTTPClient.swift; sourceTree = "<group>"; };
+		8AB3AC342FB8C4000A6A3FC /* HTTPRequestCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequestCoordinator.swift; sourceTree = "<group>"; };
+		8AB3AC362FB8C4000A6A3FC /* HomeFeedCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedCache.swift; sourceTree = "<group>"; };
+		8AB3AC382FB8C4000A6A3FC /* VodDetailCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VodDetailCache.swift; sourceTree = "<group>"; };
+		8AB3AC3A2FB8C4000A6A3FC /* ScrollOffsetReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetReader.swift; sourceTree = "<group>"; };
 		8ADD1E2B2FB8B415009016AA /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -164,6 +172,7 @@
 				8AB3AB692FB8A9000A6A3FC /* EmptyStateView.swift */,
 				8AB3AC142FB8B5000A6A3FC /* MediaPosterView.swift */,
 				8AB3AC2D2FB8C1000A6A3FC /* RemotePosterImage.swift */,
+				8AB3AC3A2FB8C4000A6A3FC /* ScrollOffsetReader.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -239,6 +248,9 @@
 			children = (
 				8AB3AC292FB8C1000A6A3FC /* ConfigStore.swift */,
 				8AB3AC2B2FB8C1000A6A3FC /* TVBoxAPIService.swift */,
+				8AB3AC342FB8C4000A6A3FC /* HTTPRequestCoordinator.swift */,
+				8AB3AC362FB8C4000A6A3FC /* HomeFeedCache.swift */,
+				8AB3AC382FB8C4000A6A3FC /* VodDetailCache.swift */,
 				8AB3AC132FB8B5000A6A3FC /* FavoritesStore.swift */,
 			);
 			path = Services;
@@ -362,6 +374,10 @@
 				8AB3AC022FB8B5000A6A3FC /* VodCategory.swift in Sources */,
 				8AB3AC202FB8C1000A6A3FC /* TVBoxHTTPClient.swift in Sources */,
 				8AB3AC312FB8C3000A6A3FC /* RawHTTPClient.swift in Sources */,
+				8AB3AC332FB8C4000A6A3FC /* HTTPRequestCoordinator.swift in Sources */,
+				8AB3AC352FB8C4000A6A3FC /* HomeFeedCache.swift in Sources */,
+				8AB3AC372FB8C4000A6A3FC /* VodDetailCache.swift in Sources */,
+				8AB3AC392FB8C4000A6A3FC /* ScrollOffsetReader.swift in Sources */,
 				8AB3AC222FB8C1000A6A3FC /* FlexibleJSON.swift in Sources */,
 				8AB3AC242FB8C1000A6A3FC /* VodDetail.swift in Sources */,
 				8AB3AC262FB8C1000A6A3FC /* PlaySource.swift in Sources */,
@@ -504,7 +520,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"EsirTV/Preview Content\"";
 				DEVELOPMENT_TEAM = 7JU26R7558;
 				ENABLE_PREVIEWS = YES;
@@ -530,7 +546,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"EsirTV/Preview Content\"";
 				DEVELOPMENT_TEAM = 7JU26R7558;
 				ENABLE_PREVIEWS = YES;

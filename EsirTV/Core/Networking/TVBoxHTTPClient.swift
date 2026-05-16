@@ -51,11 +51,15 @@ enum TVBoxHTTPClient {
 
         // http 一律走 TCP 直连，彻底绕过 ATS（不依赖 Info.plist）
         if scheme == "http" {
-            return try await RawHTTPClient.fetchData(url: url, headers: headers)
+            return try await HTTPRequestCoordinator.shared.runWithRetry {
+                try await RawHTTPClient.fetchData(url: url, headers: headers)
+            }
         }
 
         if scheme == "https" {
-            return try await fetchDataViaURLSession(url: url, extraHeaders: headers)
+            return try await HTTPRequestCoordinator.shared.runWithRetry {
+                try await fetchDataViaURLSession(url: url, extraHeaders: headers)
+            }
         }
 
         throw TVBoxHTTPError.invalidURL
@@ -112,7 +116,9 @@ enum TVBoxHTTPClient {
         ]
 
         if url.scheme?.lowercased() == "http" {
-            return try await RawHTTPClient.fetchData(url: url, headers: imageHeaders)
+            return try await HTTPRequestCoordinator.shared.runWithRetry {
+                try await RawHTTPClient.fetchData(url: url, headers: imageHeaders)
+            }
         }
 
         var request = URLRequest(url: url, timeoutInterval: 20)

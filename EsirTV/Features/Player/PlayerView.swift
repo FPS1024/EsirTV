@@ -6,20 +6,21 @@
 import AVKit
 import SwiftUI
 
-/// 播放界面（支持 URL 播放，无地址时显示占位）
+/// 播放界面（关闭时彻底停止音频）
 struct PlayerView: View {
     let title: String
     let episodeTitle: String?
     let streamURL: URL?
 
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var playerHolder = PlayerHolder()
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            if let streamURL {
-                VideoPlayer(player: AVPlayer(url: streamURL))
+            if let player = playerHolder.player {
+                VideoPlayer(player: player)
                     .ignoresSafeArea()
             } else {
                 placeholder
@@ -28,7 +29,7 @@ struct PlayerView: View {
             VStack {
                 HStack {
                     Button {
-                        dismiss()
+                        stopAndDismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title)
@@ -41,7 +42,19 @@ struct PlayerView: View {
                 Spacer()
             }
         }
-        .navigationBarHidden(true)
+        .onAppear {
+            if let streamURL {
+                playerHolder.start(url: streamURL)
+            }
+        }
+        .onDisappear {
+            playerHolder.stop()
+        }
+    }
+
+    private func stopAndDismiss() {
+        playerHolder.stop()
+        dismiss()
     }
 
     private var placeholder: some View {
@@ -51,10 +64,31 @@ struct PlayerView: View {
                 .foregroundColor(.white.opacity(0.8))
             Text("暂无播放地址")
                 .foregroundColor(.white.opacity(0.9))
-            Text("接入影视源后可在此播放")
-                .font(.caption)
-                .foregroundColor(.white.opacity(0.6))
         }
+    }
+}
+
+// MARK: - 播放器生命周期
+
+private final class PlayerHolder: ObservableObject {
+    @Published private(set) var player: AVPlayer?
+
+    func start(url: URL) {
+        stop()
+        let newPlayer = AVPlayer(url: url)
+        newPlayer.play()
+        player = newPlayer
+    }
+
+    func stop() {
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
+        player = nil
+    }
+
+    deinit {
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
     }
 }
 

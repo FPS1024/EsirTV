@@ -97,7 +97,7 @@ struct ConfigurationManagementView: View {
                     if !configStore.configURL.isEmpty {
                         Text("当前配置：\(configStore.configURL)")
                     }
-                    Text("若提示 ATS 错误，请确认 Build ≥ 5 并删除旧版后重装")
+                    Text("若提示 ATS 错误，请确认 Build ≥ 6 并删除旧版后重装")
                 }
                 .font(.caption2)
             }

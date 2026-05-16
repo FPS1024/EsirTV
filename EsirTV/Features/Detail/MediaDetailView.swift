@@ -39,7 +39,9 @@ struct MediaDetailView: View {
         .task {
             await viewModel.loadDetail(configStore: configStore)
         }
-        .fullScreenCover(isPresented: $viewModel.showPlayer) {
+        .fullScreenCover(isPresented: $viewModel.showPlayer, onDismiss: {
+            viewModel.stopPlayer()
+        }) {
             NavigationStack {
                 PlayerView(
                     title: viewModel.displayTitle,

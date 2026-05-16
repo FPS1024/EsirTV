@@ -6,7 +6,7 @@
 import Foundation
 
 /// 详情页完整数据
-struct VodDetail: Identifiable, Hashable {
+struct VodDetail: Identifiable, Hashable, Codable {
     let siteKey: String
     let vodId: String
     var title: String
@@ -63,5 +63,29 @@ struct VodDetail: Identifiable, Hashable {
         let playFrom = FlexibleJSON.string(from: dictionary["vod_play_from"])
         let playUrl = FlexibleJSON.string(from: dictionary["vod_play_url"])
         playSources = PlaySourceParser.parse(playFrom: playFrom, playUrl: playUrl)
+    }
+
+    init(
+        siteKey: String,
+        vodId: String,
+        title: String,
+        posterURL: String,
+        typeName: String,
+        vodYear: String,
+        vodArea: String,
+        remarks: String,
+        synopsis: String,
+        playSources: [PlaySource]
+    ) {
+        self.siteKey = siteKey
+        self.vodId = vodId
+        self.title = title
+        self.posterURL = posterURL
+        self.typeName = typeName
+        self.vodYear = vodYear
+        self.vodArea = vodArea
+        self.remarks = remarks
+        self.synopsis = synopsis
+        self.playSources = playSources
     }
 }

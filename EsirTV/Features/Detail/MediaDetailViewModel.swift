@@ -17,6 +17,8 @@ final class MediaDetailViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    private var loadTask: Task<Void, Never>?
+
     var playSources: [PlaySource] {
         detail?.playSources ?? []
     }
@@ -42,30 +44,56 @@ final class MediaDetailViewModel: ObservableObject {
 
     init(listItem: VodItem) {
         self.listItem = listItem
+        if let cached = VodDetailCache.shared.detail(for: listItem) {
+            applyDetail(cached)
+        }
     }
 
     func loadDetail(configStore: ConfigStore) async {
+        if detail != nil, VodDetailCache.shared.detail(for: listItem) != nil {
+            return
+        }
+
+        loadTask?.cancel()
+        loadTask = Task {
+            await fetchDetail(configStore: configStore)
+        }
+        await loadTask?.value
+    }
+
+    private func fetchDetail(configStore: ConfigStore) async {
         guard let site = configStore.sites.first(where: { $0.id == listItem.siteKey }) else {
             errorMessage = "站点不存在"
             return
         }
 
-        isLoading = true
+        isLoading = detail == nil
         errorMessage = nil
         defer { isLoading = false }
 
         do {
+            try Task.checkCancellation()
             let loaded = try await TVBoxAPIService.fetchDetail(
                 apiURL: site.api,
                 siteKey: listItem.siteKey,
                 vodId: listItem.vodId
             )
-            detail = loaded
-            selectedSourceIndex = 0
-            selectedEpisode = loaded.playSources.first?.episodes.first
+            guard !Task.isCancelled else { return }
+            applyDetail(loaded)
+            VodDetailCache.shared.save(loaded)
+        } catch is CancellationError {
+            return
         } catch {
-            errorMessage = error.localizedDescription
+            if detail == nil {
+                errorMessage = error.localizedDescription
+            }
         }
+    }
+
+    private func applyDetail(_ loaded: VodDetail) {
+        detail = loaded
+        selectedSourceIndex = 0
+        selectedEpisode = loaded.playSources.first?.episodes.first
     }
 
     func selectSource(at index: Int) {
@@ -80,5 +108,9 @@ final class MediaDetailViewModel: ObservableObject {
 
     func play() {
         showPlayer = true
+    }
+
+    func stopPlayer() {
+        showPlayer = false
     }
 }
