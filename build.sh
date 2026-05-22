@@ -103,10 +103,16 @@ sign_app_for_trollstore() {
     local app="$1"
     local binary="${app}/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "${app}/Info.plist" 2>/dev/null || echo "${PROJECT_NAME}")"
 
+    local entitlements="${SCRIPT_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.entitlements"
+
     if command -v ldid >/dev/null 2>&1; then
         info "使用 ldid 为 TrollStore 签名..."
-        # 签名主程序
-        ldid -S "${binary}"
+        # 签名主程序（含组播 / 本地网络 entitlement）
+        if [[ -f "${entitlements}" ]]; then
+            ldid -S"${entitlements}" "${binary}"
+        else
+            ldid -S "${binary}"
+        fi
         # 签名内嵌 Framework（如有）
         if [[ -d "${app}/Frameworks" ]]; then
             find "${app}/Frameworks" \( -name "*.dylib" -o -name "*.framework" \) 2>/dev/null | while read -r item; do

@@ -20,7 +20,13 @@ enum UPnPXMLParser {
         var controlURL: String?
         var serviceType: String?
 
-        if let serviceBlock = extractServiceBlock(xml, serviceId: "urn:upnp-org:serviceId:AVTransport") {
+        let blocks = extractAllServiceBlocks(xml)
+        let avBlock = blocks.first { block in
+            block.localizedCaseInsensitiveContains("AVTransport")
+                || block.localizedCaseInsensitiveContains("urn:upnp-org:serviceId:AVTransport")
+        } ?? blocks.first
+
+        if let serviceBlock = avBlock {
             serviceType = extractTag("serviceType", from: serviceBlock)
             if let rawControl = extractTag("controlURL", from: serviceBlock) {
                 controlURL = resolveURL(base: baseLocation, relative: rawControl)
@@ -36,17 +42,16 @@ enum UPnPXMLParser {
         )
     }
 
-    private static func extractServiceBlock(_ xml: String, serviceId: String) -> String? {
-        let pattern = "<service[\\s\\S]*?\(NSRegularExpression.escapedPattern(for: serviceId))[\\s\\S]*?</service>"
+    private static func extractAllServiceBlocks(_ xml: String) -> [String] {
+        let pattern = "<service[\\s\\S]*?</service>"
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return nil
+            return []
         }
         let range = NSRange(xml.startIndex..<xml.endIndex, in: xml)
-        guard let match = regex.firstMatch(in: xml, range: range),
-              let blockRange = Range(match.range, in: xml) else {
-            return nil
+        return regex.matches(in: xml, range: range).compactMap { match in
+            guard let blockRange = Range(match.range, in: xml) else { return nil }
+            return String(xml[blockRange])
         }
-        return String(xml[blockRange])
     }
 
     private static func extractTag(_ tag: String, from xml: String) -> String? {

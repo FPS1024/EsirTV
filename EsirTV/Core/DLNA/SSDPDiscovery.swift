@@ -3,8 +3,8 @@
 //  EsirTV
 //
 
-import Foundation
 import Darwin
+import Foundation
 
 enum SSDPDiscovery {
     private static let multicastHost = "239.255.255.250"
@@ -37,7 +37,7 @@ enum SSDPDiscovery {
             }
         }
 
-        var timeVal = timeval(tv_sec: 0, tv_usec: Int32(timeout * 1_000_000))
+        var timeVal = receiveTimeout(from: timeout)
         setsockopt(socketFD, SOL_SOCKET, SO_RCVTIMEO, &timeVal, socklen_t(MemoryLayout<timeval>.size))
 
         let searchTargets = [
@@ -59,6 +59,12 @@ enum SSDPDiscovery {
             }
         }
         return locations
+    }
+
+    private static func receiveTimeout(from timeout: TimeInterval) -> timeval {
+        let seconds = max(0, Int(timeout))
+        let microseconds = max(0, Int((timeout - Double(seconds)) * 1_000_000))
+        return timeval(tv_sec: seconds, tv_usec: Int32(microseconds))
     }
 
     private static func buildMSearch(target: String) -> String {

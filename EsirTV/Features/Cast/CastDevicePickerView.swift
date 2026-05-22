@@ -13,6 +13,7 @@ struct CastDevicePickerView: View {
     @ObservedObject private var dlna = DLNAManager.shared
     @State private var castingDeviceID: String?
     @State private var toast: String?
+    @State private var manualIP = ""
 
     var body: some View {
         NavigationStack {
@@ -41,6 +42,9 @@ struct CastDevicePickerView: View {
                     .disabled(dlna.isDiscovering)
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                manualSection
+            }
             .task {
                 await dlna.discoverDevices()
             }
@@ -55,21 +59,47 @@ struct CastDevicePickerView: View {
         }
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "tv")
-                .font(.system(size: 44))
+    private var manualSection: some View {
+        VStack(spacing: 10) {
+            Text("未搜到设备？输入电视 IP（设置 → 网络 → 本机 IP）")
+                .font(.caption)
                 .foregroundStyle(.secondary)
-            Text(dlna.lastError ?? "未发现设备")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-            Button("重新搜索") {
-                Task { await dlna.discoverDevices() }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack {
+                TextField("例如 192.168.1.100", text: $manualIP)
+                    .keyboardType(.decimalPad)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+
+                Button("添加") {
+                    addManualDevice()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(manualIP.trimmingCharacters(in: .whitespaces).isEmpty || dlna.isDiscovering)
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.bar)
+    }
+
+    private var emptyState: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                Image(systemName: "tv")
+                    .font(.system(size: 44))
+                    .foregroundStyle(.secondary)
+                Text(dlna.lastError ?? "未发现设备")
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+                Button("重新搜索") {
+                    Task { await dlna.discoverDevices() }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding()
+        }
     }
 
     private var deviceList: some View {
@@ -80,7 +110,13 @@ struct CastDevicePickerView: View {
                 HStack {
                     Image(systemName: "tv.fill")
                         .foregroundStyle(.tint)
-                    Text(device.name)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(device.name)
+                        Text(device.location)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                     Spacer()
                     if castingDeviceID == device.id {
                         ProgressView()
@@ -88,6 +124,17 @@ struct CastDevicePickerView: View {
                 }
             }
             .disabled(castingDeviceID != nil)
+        }
+    }
+
+    private func addManualDevice() {
+        let ip = manualIP.trimmingCharacters(in: .whitespacesAndNewlines)
+        Task {
+            let ok = await dlna.addManualDevice(ip: ip)
+            if ok {
+                toast = "已添加设备"
+                manualIP = ""
+            }
         }
     }
 

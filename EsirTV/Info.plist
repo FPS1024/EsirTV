@@ -35,6 +35,12 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>EsirTV 需要访问局域网以发现 DLNA 电视、加载本地影视源并投屏播放。</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_http._tcp</string>
+		<string>_upnp._tcp</string>
+		<string>_services._dns-sd._udp</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
